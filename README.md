@@ -26,20 +26,21 @@ Install Conan via `pip`:
 
 ```bash
 pip install conan
-
+---
 ##  Step 2: Install SymEngine
 
 conan profile detect
-
+---
 ## Step 3: Integrate SymEngine in Your Project
 
 conan install . --output-folder=build --build=missing
-
+---
 ## Step 4: Configure with CMake
 
 cd build
 cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake
-
+---
 ## Step 5: Build the Project
 
 cmake --build . --config Release
+---
