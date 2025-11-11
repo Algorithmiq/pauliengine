@@ -249,7 +249,7 @@ class QubitHamiltonian {
 
 };
 
-NB_MODULE(pauliEngine, m) {
+NB_MODULE(PauliEngine, m) {
         nb::class_<PauliString<>>(m, "PauliString", "Represents a Pauli string in binary symplectic form.")
                 .def(nb::init<>(), "Default constructor.")
                 .def(nb::init<const std::unordered_map<int, std::string>&, std::complex<double>>(),
@@ -267,7 +267,10 @@ NB_MODULE(pauliEngine, m) {
                 .def("__mul__", nb::overload_cast<const std::complex<double>>(&PauliString<>::operator*), "Scale PauliString by complex scalar")
                 .def("__imul__", nb::overload_cast<const std::complex<double>>(&PauliString<>::operator*=), "In-place scale")
                 .def("__imul__", nb::overload_cast<PauliString<>>(&PauliString<>::operator*=), "In-place multiply")
-                .def("__eq__", &PauliString<>::operator==, "Checks equality ignoring the coefficient.");
+                .def("__eq__", &PauliString<>::equals, "Checks equality.")
+                .def("diff", &PauliString<>::key_openfermion, "Returns Paulistring in Openfermion format")
+                .def("qubits", &PauliString<>::qubits, "Returns list of qubits")
+                .def("get_pauli_at_index", &PauliString<>::get_pauli_from_index, "Returns list of qubits");
 
         nb::class_<QubitHamiltonian>(m, "QubitHamiltonian", "Represents a Hamiltonian as a sum of Pauli strings.")
                 .def(nb::init<const std::vector<PauliString<>>&>(), "Constructor from a vector of Pauli strings.")
@@ -284,7 +287,7 @@ NB_MODULE(pauliEngine, m) {
                 .def("parse_python_format", &QubitHamiltonian::parse_python_format, "Konvertiert mit SymEngine-Koeffizienten");
 
                 
-        m.def("test_symengine", &testSymengine, "Symengine testen");
+        m.def("to_complex", &to_complex, "Parse Symengine expression into complex number");
 
         nb::class_<SymEngine::Expression>(m, "Expression")
                 .def(nb::init<const std::string&>())  // Konstruktor aus String

@@ -4,6 +4,7 @@
 #include <complex>
 #include <vector>
 #include <iostream>
+#include <bit>
 
 //Wenn ohne symengine dann mit dummy Klasse
 
@@ -197,10 +198,10 @@ class PauliString {
                         int first_fac = 0;
                         int second_fac = 0;
                         for (size_t i = 0; i < max_length; i++) {
-                                first_fac += popcount((~x1[i] & x2[i] & y1[i] & y2[i]) ^
+                                first_fac += std::popcount((~x1[i] & x2[i] & y1[i] & y2[i]) ^
                                                 (x1[i] & ~x2[i] & ~y1[i] & y2[i]) ^
                                                 (x1[i] & x2[i] & y1[i] & ~y2[i]));
-                                second_fac += popcount((~x1[i] & x2[i] & y1[i] & ~y2[i]) ^
+                                second_fac += std::popcount((~x1[i] & x2[i] & y1[i] & ~y2[i]) ^
                                                 (x1[i] & ~x2[i] & y1[i] & y2[i]) ^
                                                 (x1[i] & x2[i] & ~y1[i] & y2[i]));
                         }
@@ -241,8 +242,8 @@ class PauliString {
                         int first_fac = 0;
                         int second_fac = 0;
                         for (int i = 0; i < max_length; i++) {
-                                first_fac += popcount((~this->x[i] & other.x[i] & this->y[i] & other.y[i]) ^ (this->x[i] & ~other.x[i] & ~this->y[i] & other.y[i]) ^ (this->x[i] & other.x[i] & this->y[i] & ~other.y[i]));
-                                second_fac += popcount((~this->x[i] & other.x[i] & this->y[i] & ~other.y[i]) ^ (this->x[i] & ~other.x[i] & this->y[i] & other.y[i]) ^ (this->x[i] & other.x[i] & ~this->y[i] & other.y[i]));
+                                first_fac += std::popcount((~this->x[i] & other.x[i] & this->y[i] & other.y[i]) ^ (this->x[i] & ~other.x[i] & ~this->y[i] & other.y[i]) ^ (this->x[i] & other.x[i] & this->y[i] & ~other.y[i]));
+                                second_fac += std::popcount((~this->x[i] & other.x[i] & this->y[i] & ~other.y[i]) ^ (this->x[i] & ~other.x[i] & this->y[i] & other.y[i]) ^ (this->x[i] & other.x[i] & ~this->y[i] & other.y[i]));
                         }
                         int tau = first_fac - second_fac;
                         std::complex<double> coeff_new{1.0, 0.0};
@@ -340,8 +341,8 @@ class PauliString {
                         int first_fac = 0;
                         int second_fac = 0;
                         for (int i = 0; i < max_length; i++) {
-                                first_fac += popcount((~this->x[i] & other.x[i] & this->y[i] & other.y[i]) ^ (this->x[i] & ~other.x[i] & ~this->y[i] & other.y[i]) ^ (this->x[i] & other.x[i] & this->y[i] & ~other.y[i]));
-                                second_fac += popcount((~this->x[i] & other.x[i] & this->y[i] & ~other.y[i]) ^ (this->x[i] & ~other.x[i] & this->y[i] & other.y[i]) ^ (this->x[i] & other.x[i] & ~this->y[i] & other.y[i]));
+                                first_fac += std::popcount((~this->x[i] & other.x[i] & this->y[i] & other.y[i]) ^ (this->x[i] & ~other.x[i] & ~this->y[i] & other.y[i]) ^ (this->x[i] & other.x[i] & this->y[i] & ~other.y[i]));
+                                second_fac += std::popcount((~this->x[i] & other.x[i] & this->y[i] & ~other.y[i]) ^ (this->x[i] & ~other.x[i] & this->y[i] & other.y[i]) ^ (this->x[i] & other.x[i] & ~this->y[i] & other.y[i]));
                         }
                         int tau = first_fac - second_fac;
                         std::complex<double> coeff_new{1.0, 0.0};
@@ -490,8 +491,10 @@ class PauliString {
                 }
 
                 bool equals(const PauliString& other) {
-                        return this.x == other.x && this.y == other.y && this.coeff == other.coeff;
+                        return this->x == other.x && this->y == other.y && this->coeff == other.coeff;
                 }
+
+                
 
         private:
                 static set_basic get_free_symbols(const Expression& expr) {
@@ -516,16 +519,28 @@ inline int popcount(uint64_t x) {
         return count;
 }
 
-void testSymengine() {
-        Expression y("y");
-        Expression expr = y + std::complex<double>{0.0,  1.0};
-        Expression x("x");
-        expr = expr * x;
-        std::cout << "Expression: " << expr << std::endl;
-        map_basic_basic substitutions;
-        substitutions[x] = Complex::from_two_nums(Integer(2), Integer(3));
-        expr = expr.subs(substitutions);
-        std::cout << "Expression: " << expr << std::endl;
+static std::complex<double> to_complex(const Expression &expr) {
+    const auto &basic = *expr.get_basic();
+
+    if (is_a<RealDouble>(basic)) {
+        const auto &rd = down_cast<const RealDouble &>(basic);
+        return { rd.as_double(), 0.0 };
+    } 
+    else if (is_a<ComplexDouble>(basic)) {
+        const auto &cd = down_cast<const ComplexDouble &>(basic);
+        return {
+            eval_double(*cd.real_part()),
+            eval_double(*cd.imaginary_part())
+        };
+    } 
+    else {
+        try {
+            double val = eval_double(basic);
+            return { val, 0.0 };
+        } catch (...) {
+            throw std::runtime_error("Expression cannot be converted to std::complex<double>.");
+        }
+    }
 }
 
 
