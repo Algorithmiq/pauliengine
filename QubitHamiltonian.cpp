@@ -267,10 +267,10 @@ NB_MODULE(PauliEngine, m) {
                 .def("__mul__", nb::overload_cast<const std::complex<double>>(&PauliString<>::operator*), "Scale PauliString by complex scalar")
                 .def("__imul__", nb::overload_cast<const std::complex<double>>(&PauliString<>::operator*=), "In-place scale")
                 .def("__imul__", nb::overload_cast<PauliString<>>(&PauliString<>::operator*=), "In-place multiply")
-                .def("__eq__", &PauliString<>::equals, "Checks equality.")
+                .def("__eq__", &PauliString<>::equals, "Checks if 2 PauliStrings have same data and Coefficient")
                 .def("diff", &PauliString<>::key_openfermion, "Returns Paulistring in Openfermion format")
                 .def("qubits", &PauliString<>::qubits, "Returns list of qubits")
-                .def("equals", &PauliString<>::operator==, "Checks if 2 PauliStrings have same data and Coefficient")
+                .def("equals", &PauliString<>::operator==, "Checks if 2 PauliStrings have same data")
                 .def("set_coeff", nb::overload_cast<SymEngine::Expression>(&PauliString<>::set_coeff), "Sets coefficient using a SymEngine expression")
                 .def("set_coeff", nb::overload_cast<std::complex<double>>(&PauliString<>::set_coeff), "Sets coefficient using a complex number")
                 .def("get_pauli_at_index", &PauliString<>::get_pauli_from_index, "Returns list of qubits");
