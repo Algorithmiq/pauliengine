@@ -5,7 +5,7 @@
 #include <vector>
 #include <iostream>
 #include <bit>
-
+#include <functional>
 //Wenn ohne symengine dann mit dummy Klasse
 
 #ifdef HAVE_SYMENGINE
@@ -26,6 +26,10 @@ const std::complex<double> Unit_matrix(0.0 , 1.0);
 
 inline int popcount(uint64_t x); 
 void testSymengine();
+
+
+
+
 
 template<typename Coeff = CoeffType>
 class PauliString {
@@ -546,15 +550,17 @@ class PauliString {
 
 };
 
-inline int popcount(uint64_t x) {
-        int count = 0;
-        while (x) {
-                count += x & 1;
-                x >>= 1;
+struct PauliStringHash {
+    size_t operator()(const PauliString<>& ps) const {
+        size_t seed = 0;
+        for (auto& val : ps.x) {
+            seed ^= std::hash<uint64_t>{}(val) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
         }
-        return count;
-}
-
-
+        for (auto& val : ps.y) {
+            seed ^= std::hash<uint64_t>{}(val) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        }
+        return seed;
+    }
+};
 
 

@@ -73,7 +73,7 @@ class QubitHamiltonian {
                                         data.push_back(entry_first * entry_second);                       
                                 }    
                         }
-                        return QubitHamiltonian(data);
+                        return QubitHamiltonian(data).compact();
                 }
                 // Fehlerbehandlung im Wrapper
                 QubitHamiltonian trace_out_qubits(const std::vector<int>& qubits, const std::vector<int>& state) {
@@ -190,11 +190,11 @@ class QubitHamiltonian {
                         }
                         return QubitHamiltonian(temp_data);
                 }
-                /*
-                void compact() {
-                        std::unordered_map<PauliString<>, std::complex<double>, PauliStringHash> merged;
+
+                QubitHamiltonian compact() {
+                        std::unordered_map<PauliString<>, SymEngine::Expression, PauliStringHash> merged;
                         for (const auto& ps : data) {
-                                merged[ps] += ps.coeff;
+                                merged[ps] = merged[ps] + ps.coeff;
                         }
                         data.clear();
                         for (const auto& [ps, coeff] : merged) {
@@ -202,8 +202,9 @@ class QubitHamiltonian {
                                 new_ps.coeff = coeff;
                                 data.push_back(new_ps);
                         }
+                        return QubitHamiltonian(data);
                 }
-                */
+                
 
         private:
                 
