@@ -6,7 +6,7 @@
 #include <iostream>
 #include <bit>
 #include <functional>
-//Wenn ohne symengine dann mit dummy Klasse
+
 
 #ifdef HAVE_SYMENGINE
 #include <symengine/expression.h>
@@ -48,13 +48,11 @@ class PauliString {
                         this->is_zero = true;
                 }
 
-                        //Erstellt aus dem Tupel (coeff, Paulistring) einen PauliString in Binary Simplectic Representation
+
                 PauliString(const std::unordered_map<int, std::string>& data, std::complex<double> coeff) {
                         this->coeff = coeff;
                         uint64_t mask;
                         for (const auto& [key, value] : data) {
-                                //Bestimmen ob genug Speicherbits in x und y vorhanden sind. Wenn nicht 0 einfügen
-
                                 size_t index = key / BITS_IN_INTEGER;
                                 if((index) + 1 > x.size()) {
                                         size_t difference = index + 1 - x.size();
@@ -77,7 +75,7 @@ class PauliString {
                         this->coeff = coeff;
                         uint64_t mask;
                         for (const auto& [key, value] : data) {
-                                //Bestimmen ob genug Speicherbits in x und y vorhanden sind. Wenn nicht 0 einfügen
+
 
                                 size_t index = key / BITS_IN_INTEGER;
                                 if((index) + 1 > x.size()) {
@@ -101,7 +99,6 @@ class PauliString {
                         this->coeff = coeff;
                         uint64_t mask;
                         for (const auto& [key, value] : data) {
-                                //Bestimmen ob genug Speicherbits in x und y vorhanden sind. Wenn nicht 0 einfügen
 
                                 size_t index = key / BITS_IN_INTEGER;
                                 if((index) + 1 > x.size()) {
@@ -121,13 +118,12 @@ class PauliString {
                         }
                 }
 
-                //Basic Konstruktor, wird für Multiplikation benötigt
                 PauliString(const std::vector<uint64_t>& x, const std::vector<uint64_t>& y, Coeff coeff) {
                         this->x = x;
                         this->y = y;
                         this->coeff = coeff;
                 }
-                //Konstruktor vom Openfermion format
+
                 PauliString(const std::pair<std::vector<std::pair<char, int>>, Coeff>& input) {
                         this->coeff = input.second;
                         std::vector<std::pair<char, int>> paulis = input.first;
@@ -171,7 +167,7 @@ class PauliString {
                 }
 
 
-                // Equals Operator: 2 Paulistrings sind gleich, wenn die x und y Werte gleich sind, Koeffizient ist egal
+
                 bool operator==(const PauliString& other) const {
                         return x == other.x && y == other.y;
                 }
@@ -179,7 +175,6 @@ class PauliString {
                 PauliString operator*(const PauliString& other) const {
                         size_t max_length = std::max(this->x.size(), other.x.size());
 
-                        // Lokale Kopien, da wir nicht in const-Objekten modifizieren dürfen
                         std::vector<uint64_t> x1 = this->x;
                         std::vector<uint64_t> y1 = this->y;
                         std::vector<uint64_t> x2 = other.x;
@@ -221,12 +216,12 @@ class PauliString {
 
                         return PauliString(new_x, new_y, coeff_temp * coeff_new);
                 }
-                //Scaling right
+
                 PauliString operator*(const std::complex<double> scalar) {
                         return PauliString(this->x, this->y, this->coeff * scalar);
                 }
 
-                //Scaling InPlace
+
                 PauliString& operator*=(const std::complex<double> scalar)  {
                         this->coeff*= scalar;
                         return *this;

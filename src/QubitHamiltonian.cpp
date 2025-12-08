@@ -75,7 +75,7 @@ class QubitHamiltonian {
                         }
                         return QubitHamiltonian(data).compact();
                 }
-                // Fehlerbehandlung im Wrapper
+
                 QubitHamiltonian trace_out_qubits(const std::vector<int>& qubits, const std::vector<int>& state) {
                         std::vector<PauliString<>> reduced(this->data.size());
                         for (PauliString<>& current : this-> data) {
@@ -86,23 +86,7 @@ class QubitHamiltonian {
                         }
                         return QubitHamiltonian(reduced);
                 }
-                /* TODO: Wenn expression noch variablen haben, nicht ausführen
-                Matrix2D hamiltonian_to_matrix(const QubitHamiltonian& H_input, int num_qubits) {
-                        int dim = 1 << num_qubits;
-                        Hamiltonian_structure H = H_input.parse_python_format();
-                        Matrix2D mat(dim, std::vector<std::complex<double>>(dim, 0));
 
-                        for (const auto& [coef, pauli_map] : H) {
-                                Matrix2D term_mat = pauli_string_to_matrix(pauli_map, num_qubits);
-                                for (int i=0; i<dim; ++i) {
-                                        for (int j=0; j<dim; ++j) {
-                                                mat[i][j] += coef * term_mat[i][j];
-                                        }
-                                }
-                        }
-                        return mat;
-                }
-                */
                 #ifdef HAVE_SYMENGINE
                 Hamiltonian_structure_variable parse_python_format() const{
                         Hamiltonian_structure_variable output;
@@ -288,14 +272,12 @@ NB_MODULE(PauliEngine, m) {
                 .def("__mul__", nb::overload_cast<std::complex<double> const>(&QubitHamiltonian::operator*, nb::const_), "Scales the Hamiltonian by a complex scalar.")
                 .def("__mul__", nb::overload_cast<QubitHamiltonian const>(&QubitHamiltonian::operator*, nb::const_), "Multiplies two Hamiltonians.")
                 .def("trace_out_qubits", &QubitHamiltonian::trace_out_qubits, "Traces out specified qubits in given states.")
-                //.def("hamiltonian_to_matrix", &QubitHamiltonian::hamiltonian_to_matrix, "Converts the Hamiltonian to its full matrix representation.")
                 .def("to_string", &QubitHamiltonian::to_string, "Converts the Hamiltonian to its full matrix representation.")
                 .def("diff", &QubitHamiltonian::diff, "Differentiation after given Variable")
                 .def("subs", &QubitHamiltonian::substitute, "Replace Variable with value")
                 .def("parse_python_format", &QubitHamiltonian::parse_python_format, "Konvertiert mit SymEngine-Koeffizienten");
 
-                
-        //m.def("to_complex", &PauliString::to_complex, "Parse SymEngine expression into complex number");
+
 
         nb::class_<SymEngine::Expression>(m, "Expression")
                 .def(nb::init<const std::string&>())  // Konstruktor aus String
