@@ -115,7 +115,7 @@ The following items are planned or not yet fully implemented:
     
 -   Installation via pip.
     
--   A comprehensive test suite is currently under development and will be included in an upcoming version.
+-   A comprehensive test suite.
  
  ---
  Performance may vary in future Versions
