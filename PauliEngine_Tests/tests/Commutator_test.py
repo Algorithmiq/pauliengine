@@ -4,7 +4,6 @@ import PauliEngine
 
 
 def generate_paulistring(length):
-    """Erzeugt ein dict {index: 'X'/'Y'/'Z'/'I'} für einen PauliString."""
     result = {}
     paulis = ["X", "Y", "Z", "I"]
     for i in range(length):
@@ -13,13 +12,10 @@ def generate_paulistring(length):
 
 
 def to_openfermion(pauli_dict, coeff):
-    """
-    Wandelt dein Pauli-Dict in einen OpenFermion-QubitOperator um.
-    Beispiel: {0:'X', 1:'I', 2:'Z'} -> QubitOperator('X0 Z2', coeff)
-    """
+
     terms = []
     for qubit, p in pauli_dict.items():
-        if p != 'I':  # Identität überspringen
+        if p != 'I': 
             terms.append(f"{p}{qubit}")
     term_str = ' '.join(terms)
     return QubitOperator(term_str, coeff)
@@ -46,7 +42,7 @@ for i in range(test_amount):
 
 for i in range (len(test_paulis)):
     print("#################################")
-    print("---------Own--------")
+    print("---------Built-In Commutator--------")
     result = fix_pauli.commutator(test_paulis[i])
     result_coeff = PauliEngine.to_complex(result.get_coeff())
     print(result_coeff)
@@ -61,7 +57,7 @@ for i in range (len(test_paulis)):
     if result_coeff != ab_ba:
         counter += 1
 
-print(counter)
+
 
 
 
