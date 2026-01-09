@@ -1,6 +1,6 @@
 # PauliEngine: Fast Arithmetics for Quantum Operators
 
-See more in (https://arxiv.org/abs/2601.02233)[arXiv:2601.02233]  
+See more in [https://arxiv.org/abs/2601.02233](arXiv:2601.02233)
 
 This project is currently in **beta**. Some features are incomplete or still under development.  
 The following items are planned or not yet fully implemented:
