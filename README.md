@@ -59,7 +59,7 @@ H2 = H.subs ({"a": 2.0})
 
 This guide explains how to install and build **SymEngine** and integrate it into a C++ project on **Windows** using **Conan**, **CMake**, and **Visual Studio**.
 
-  
+Note: When the project is built without SymEngine, runtime performance drops significantly!
 
 ---
 
