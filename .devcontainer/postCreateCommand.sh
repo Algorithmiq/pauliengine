@@ -20,11 +20,3 @@ from libstdcxx.v6.printers import register_libstdcxx_printers
 register_libstdcxx_printers (None)
 end
 EOT
-
-
-# git clone https://github.com/symengine/symengine.git
-# cd symengine
-# mkdir build && cd build
-# cmake ..
-# make
-# sudo make install
