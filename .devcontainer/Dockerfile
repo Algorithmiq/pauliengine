@@ -9,6 +9,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     cmake \
     gcc \
     gdb \
+    libgmp-dev \
     libblis-openmp-dev \
     libopenblas-openmp-dev \
     ninja-build \
@@ -23,6 +24,13 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
        fi \
     && apt-get autoremove -y \
     && apt-get clean -y \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && git clone https://github.com/symengine/symengine.git \
+    && cd symengine \ 
+    && mkdir build && cd build \
+    && cmake .. \
+    && make \
+    && sudo make install
 
 COPY --from=uv --chown=vscode: /uv /uvx /bin/
+
