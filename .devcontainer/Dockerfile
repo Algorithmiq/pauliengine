@@ -24,7 +24,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
        fi \
     && apt-get autoremove -y \
     && apt-get clean -y \
-    && rm -rf /var/lib/apt/lists/* 
+    && rm -rf /var/lib/apt/lists/* \
     && git clone https://github.com/symengine/symengine.git \
     && cd symengine \ 
     && mkdir build && cd build \
