@@ -2,13 +2,9 @@
 
 set -euxo pipefail
 
-
 # install uv and uvx shell completions
 echo 'eval "$(uv generate-shell-completion zsh)"' >> /home/vscode/.zshrc
 echo 'eval "$(uvx --generate-shell-completion zsh)"' >> /home/vscode/.zshrc
-
-#source OneAPI environment in current shell
-echo '. /opt/intel/oneapi/setvars.sh &> /dev/null' >> /home/vscode/.zshrc
 
 # set up GDB to view contents of STL containers
 gcc_version="$(gcc --version | awk 'NR==1 {print $NF}')"
