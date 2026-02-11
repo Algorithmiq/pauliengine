@@ -52,10 +52,6 @@ cache-keys = [
   { file = "CMakeLists.txt" },
 ]
 
-[tool.uv.sources]
-aurora-utils = { index = "algo-pypi" }
-aurora-measurement = { index = "algo-pypi" }
-
 [[tool.uv.index]]
 name = "pypi"
 url = "https://pypi.org/simple"
