@@ -99,6 +99,7 @@ jobs:
           CIBW_ENVIRONMENT_LINUX: >
             CIBW="true"
             SKBUILD_BUILD_TOOL_ARGS="-j4;-l5"
+            CMAKE_PREFIX_PATH="$HOME/.local"
           # set deployment target for C++20 compatibility
           # make brew-installed OpenMP discoverable by CMake
           # do not activate architecture-dependent compiler flags
@@ -106,7 +107,7 @@ jobs:
           CIBW_ENVIRONMENT_MACOS: >
             CIBW="true"
             MACOSX_DEPLOYMENT_TARGET=15.0
-            OpenMP_ROOT="$(brew --prefix)/opt/libomp"
+            CMAKE_PREFIX_PATH="$HOME/.local"
           # build 3.10, 3.11, 3.12, 3.13 (with GIL), and 3.14 (with GIL)
           CIBW_BUILD: "cp310-* cp311-* cp312-* cp313-* cp314-*"
           # skip musl builds, and PyPy builds
