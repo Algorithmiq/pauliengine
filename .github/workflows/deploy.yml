@@ -87,7 +87,7 @@ jobs:
           CIBW_BUILD_VERBOSITY: 1
           CIBW_DEBUG_TRACEBACK: TRUE
           CIBW_BEFORE_ALL_LINUX: |
-            dnf install -y libgmp-dev
+            dnf install -y gmp
             # install symengine
             ./tools/install-deps.sh 
           CIBW_BEFORE_ALL_MACOS: |
