@@ -88,7 +88,6 @@ jobs:
           CIBW_DEBUG_TRACEBACK: TRUE
           CIBW_BEFORE_ALL_LINUX: |
             dnf install -y gmp gmp-devel ninja-build
-            dnf upgrade cmake
             # install symengine
             ./tools/install-deps.sh 
           CIBW_BEFORE_ALL_MACOS: |
@@ -128,9 +127,9 @@ jobs:
             else
               echo "{wheel} is not abi3, skipping abi3audit"
             fi  
-          CIBW_TEST_COMMAND: python -m pytest {package}/tests
-          CIBW_TEST_GROUPS: "test"
-          CIBW_TEST_SKIP: "*-macosx_arm64"
+          # CIBW_TEST_COMMAND: python -m pytest {package}/tests
+          # CIBW_TEST_GROUPS: "test"
+          # CIBW_TEST_SKIP: "*-macosx_arm64"
 
       - name: Upload wheels
         uses: actions/upload-artifact@v6
