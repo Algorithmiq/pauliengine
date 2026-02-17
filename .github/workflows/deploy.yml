@@ -87,10 +87,11 @@ jobs:
           CIBW_BUILD_VERBOSITY: 1
           CIBW_DEBUG_TRACEBACK: TRUE
           CIBW_BEFORE_ALL_LINUX: |
-            dnf install -y gmp ninja-build
+            dnf install -y gmp gmp-devel ninja-build
             # install symengine
             ./tools/install-deps.sh 
           CIBW_BEFORE_ALL_MACOS: |
+            brew install gmp-devel
             # install symengine
             ./tools/install-deps.sh 
           # do not activate architecture-dependent compiler flags
