@@ -91,9 +91,10 @@ jobs:
             # install symengine
             ./tools/install-deps.sh 
           CIBW_BEFORE_ALL_MACOS: |
-            # brew install gmp-devel
+            brew install libomp
             # install symengine
-            ./tools/install-deps.sh 
+            PREFIX="${SYMEMENGINE_PREFIX:-$HOME/.local}"
+            ./tools/install-deps.sh "$PREFIX"
           # do not activate architecture-dependent compiler flags
           # 4 jobs in parallel, but do not start new ones if load average exceeds 5
           CIBW_ENVIRONMENT_LINUX: >
@@ -107,6 +108,7 @@ jobs:
           CIBW_ENVIRONMENT_MACOS: >
             CIBW="true"
             MACOSX_DEPLOYMENT_TARGET=15.0
+            OpenMP_ROOT="$(brew --prefix)/opt/libomp"
             CMAKE_PREFIX_PATH="$HOME/.local"
           # build 3.10, 3.11, 3.12, 3.13 (with GIL), and 3.14 (with GIL)
           CIBW_BUILD: "cp310-* cp311-* cp312-* cp313-* cp314-*"
