@@ -23,8 +23,6 @@ NB_MODULE(_core, m) {
                 .def(nb::init<>(), "Default constructor.")
                 .def(nb::init<const std::unordered_map<int, std::string>&, std::complex<double>>(),
                 "Constructor from a map of qubit indices to Pauli operators and a complex coefficient.")
-                .def(nb::init<const std::unordered_map<int, std::string>&, std::string>(),
-                "Constructor from a map of qubit indices to Pauli operators and a complex coefficient.")
                 .def("to_string", &PauliString<>::to_string, "Returns a human-readable string representation of the Pauli string.")
                 .def("is_all_z", &PauliString<>::is_all_z, "Checks if the Pauli string consists only of Z operators.")
                 .def("get_coeff", &PauliString<>::get_coeff, "Returns the complex coefficient of the Pauli string.")
@@ -42,16 +40,20 @@ NB_MODULE(_core, m) {
                 .def("diff", &PauliString<>::key_openfermion, "Returns Paulistring in Openfermion format")
                 .def("qubits", &PauliString<>::qubits, "Returns list of qubits")
                 .def("equals", &PauliString<>::operator==, "Checks if 2 PauliStrings have same data")
-                .def("set_coeff", nb::overload_cast<SymEngine::Expression>(&PauliString<>::set_coeff), "Sets coefficient using a SymEngine expression")
                 .def("set_coeff", nb::overload_cast<std::complex<double>>(&PauliString<>::set_coeff), "Sets coefficient using a complex number")
+                #ifdef HAVE_SYMENGINE
+                .def("set_coeff", nb::overload_cast<SymEngine::Expression>(&PauliString<>::set_coeff), "Sets coefficient using a SymEngine expression")
                 .def_static("to_complex", &PauliString<>::to_complex, "Parse SymEngine expression into complex number")
+                #endif
                 .def("copy", &PauliString<>::copy, "Create a copy of the PauliString")
                 .def("get_pauli_at_index", &PauliString<>::get_pauli_from_index, "Returns list of qubits");
 
         nb::class_<QubitHamiltonian>(m, "QubitHamiltonian", "Represents a Hamiltonian as a sum of Pauli strings.")
                 .def(nb::init<const std::vector<PauliString<>>&>(), "Constructor from a vector of Pauli strings.")
                 .def(nb::init<const Hamiltonian_structure&>(), "Constructor from a Hamiltonian structure (coefficient and operator map).")
+                #ifdef HAVE_SYMENGINE
                 .def(nb::init<const Hamiltonian_structure_variable&>(), "Constructor from a Hamiltonian structure (coefficient and operator map).")
+                #endif
                 .def("__add__", &QubitHamiltonian::operator+, "Adds two Hamiltonians.")
                 .def("__mul__", nb::overload_cast<std::complex<double> const>(&QubitHamiltonian::operator*, nb::const_), "Scales the Hamiltonian by a complex scalar.")
                 .def("__mul__", nb::overload_cast<QubitHamiltonian const>(&QubitHamiltonian::operator*, nb::const_), "Multiplies two Hamiltonians.")
@@ -64,10 +66,11 @@ NB_MODULE(_core, m) {
                 .def("__repr__",&QubitHamiltonian::to_string, "Returns a human-readable string representation of the QubitHamiltonian operator.");
 
 
-
+        #ifdef HAVE_SYMENGINE
         nb::class_<SymEngine::Expression>(m, "Expression")
                 .def(nb::init<const std::string&>())  // Konstruktor aus String
                 .def("__str__", [](const SymEngine::Expression &e) {
                         return SymEngine::str(*e.get_basic());
                 });
+        #endif
 }

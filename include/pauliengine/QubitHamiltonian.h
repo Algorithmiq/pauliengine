@@ -54,7 +54,8 @@ class QubitHamiltonian{
                                 data.push_back(entry_first * entry_second);                       
                         }    
                 }
-                return QubitHamiltonian(data).compact();
+                // return QubitHamiltonian(data).compact();
+                return QubitHamiltonian(data);
         }
         QubitHamiltonian operator+(const QubitHamiltonian& other) {
                 std::vector<PauliString<>> data;
