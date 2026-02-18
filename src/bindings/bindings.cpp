@@ -40,13 +40,8 @@ NB_MODULE(_core, m) {
                 .def("diff", &PauliString<>::key_openfermion, "Returns Paulistring in Openfermion format")
                 .def("qubits", &PauliString<>::qubits, "Returns list of qubits")
                 .def("equals", &PauliString<>::operator==, "Checks if 2 PauliStrings have same data")
-                #ifdef HAVE_SYMENGINE
-                .def("set_coeff", nb::overload_cast<std::complex<double>>(&PauliString<>::set_coeff), "Sets coefficient using a complex number")
-                .def("set_coeff", nb::overload_cast<SymEngine::Expression>(&PauliString<>::set_coeff), "Sets coefficient using a SymEngine expression")
+                .def("set_coeff", &PauliString<>::set_coeff, "Sets coefficient using a SymEngine expression")
                 .def_static("to_complex", &PauliString<>::to_complex, "Parse SymEngine expression into complex number")
-                #else
-                .def("set_coeff", &PauliString<>::set_coeff, "Sets coefficient using a complex number")
-                #endif
                 .def("copy", &PauliString<>::copy, "Create a copy of the PauliString")
                 .def("get_pauli_at_index", &PauliString<>::get_pauli_from_index, "Returns list of qubits");
 

@@ -98,7 +98,7 @@ class QubitHamiltonian{
     
     QubitHamiltonian substitute(const std::unordered_map<std::string, std::complex<double>>& substitution_map) const {
             std::vector<PauliString<>> temp_data;
-            for (const auto ps : data) {
+            for (const auto &ps : data) {
                     temp_data.push_back(ps.substitute(substitution_map));
                 }
                 return QubitHamiltonian(temp_data);
