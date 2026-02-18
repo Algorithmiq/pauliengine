@@ -28,7 +28,15 @@ if (SymEngine_FOUND)
     target_compile_definitions(pauliengine-objs PUBLIC HAVE_SYMENGINE)
     endif()
     
-  target_link_libraries(pauliengine-objs PUBLIC symengine gmp)
+if(APPLE)
+  # GMP is commonly installed via Homebrew on macOS
+  find_package(GMP REQUIRED)
+  include_directories(${GMP_INCLUDE_DIR})
+  # target_link_libraries(pauliengine-objs ${GMP_LIBRARIES})
+  target_include_directories(pauliengine-objs PUBLIC ${GMP_INCLUDE_DIR})
+endif()
+
+target_link_libraries(pauliengine-objs PUBLIC symengine gmp)
 
 
 
