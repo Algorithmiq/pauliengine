@@ -31,7 +31,7 @@ dependencies = [
 
 [dependency-groups]
 # test = ["pytest>=8.2.2,<9.0", "pytest-datadir"]
-test = ["pytest>=8.2.2,<9.0"]
+test = ["pytest"]
 dev = ["coverage", "pre-commit>=3", "ruff==0.14.4", { include-group = "test" }]
 interactive = [
   "ipykernel>=6.25",
