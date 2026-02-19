@@ -107,21 +107,26 @@ class PauliString {
                         }
                 }
 
-                // PauliString(const std::string &pauli_string, const std::complex<double> &coeff){
-                //         this->coeff = coeff;                       
-                //         for (size_t i=0; pauli_string.size(); i++){
-                //                 x.push_back(0);
-                //                 y.push_back(0);
-                //                 if (pauli_string[i] == "X" || value == "Z") {
-                //                         this->x[i] = 1;
-                //                 } 
-                //                 if (pauli_string[i] == "Y" || value == "Z") {
-                //                         this->y[i] = 1;
-                //                 }
-                //         }
-
-
-                // }
+                PauliString(const std::string &pauli_string, Coeff &coeff){
+                        uint64_t mask;
+                        for (size_t i = 0; i < pauli_string.size(); i++) {
+                                size_t index = i / BITS_IN_INTEGER;
+                                if((index) + 1 > x.size()) {
+                                        size_t difference = index + 1 - x.size();
+                                        for (int i = 0; i < difference; i++) {
+                                                x.push_back(0);
+                                                y.push_back(0);
+                                        }
+                                }
+                                mask = ((uint64_t) 1 <<  i % BITS_IN_INTEGER);
+                                if (pauli_string[i] == 'X' || pauli_string[i] == 'Z') {
+                                        this->x[index] |= mask;
+                                } 
+                                if (pauli_string[i] == 'Y' || pauli_string[i] == 'Z') {
+                                        this->y[index] |= mask;
+                                }
+                        }
+                }
 
                 uint64_t operator==(const PauliString& other) const {
                         return x == other.x && y == other.y;
