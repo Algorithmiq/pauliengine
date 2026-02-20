@@ -24,4 +24,4 @@ uv pip install conan
 
 # setup conan profile and install dependencies
 conan profile detect --force 
-conan install . --output-folder=build --build=missing 
+conan install .  --output-folder=build --build=missing -pr ./conan_profile

@@ -90,9 +90,15 @@ jobs:
           CIBW_BUILD_VERBOSITY: 1
           CIBW_DEBUG_TRACEBACK: TRUE
           CIBW_BEFORE_ALL_LINUX: |
-            dnf install -y gmp gmp-devel ninja-build
+            dnf install -y ninja-build
+            
+            # install conan and C++ dependencies for the project
+            pip install conan
+            conan profile --detect
+
             # install symengine
-            ./tools/install-deps.sh 
+            conan install .  --output-folder=build --build=missing -pr ./conan_profile
+             
           CIBW_BEFORE_ALL_MACOS: |
             brew install gmp
             # install symengine
@@ -113,13 +119,6 @@ jobs:
           CIBW_ENVIRONMENT_MACOS: >
              CIBW="true"
              MACOSX_DEPLOYMENT_TARGET=15.0
-             GMP_PREFIX="$(brew --prefix gmp)"
-             CPPFLAGS="-I${GMP_PREFIX}/include ${CPPFLAGS}"
-             CFLAGS="-I${GMP_PREFIX}/include ${CFLAGS}"
-             CXXFLAGS="-I${GMP_PREFIX}/include ${CXXFLAGS}"
-             LDFLAGS="-L${GMP_PREFIX}/lib ${LDFLAGS}"
-             PKG_CONFIG_PATH="${GMP_PREFIX}/lib/pkgconfig:${PKG_CONFIG_PATH}"
-             CMAKE_PREFIX_PATH="${GMP_PREFIX}:$HOME/.local:${CMAKE_PREFIX_PATH}"
           CIBW_ENVIRONMENT_WINDOWS: >
             CIBW="true"
           # build 3.10, 3.11, 3.12, 3.13 (with GIL), and 3.14 (with GIL)
