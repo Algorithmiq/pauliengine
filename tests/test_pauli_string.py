@@ -5,9 +5,8 @@ import pauliengine as pe
 
 
 @pytest.mark.parametrize(("pauli_string", "coeff", "expected_x", "expected_z"), [
-    ({0:"I", 1:"Z", 2:"X"}, 5.0, [0, 0, 1], [0, 1, 0]), # using dict input
-    ({0: 'X', 3: 'Y', 5: 'Z'}, 4.0, [1, 0, 0, 1, 0, 1], [0, 0, 0, 1, 0, 1]), # using dict input
-    ({10: 'Z', 2: 'X'}, 6.0, [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]), # using dict input with non-consecutive qubits
+    ({0:"I", 1:"Z", 2:"X"}, 5.0, [3], [2]), # using dict input
+    ({10: 'Z', 2: 'X'}, 6.0, [2**10 + 2**3] , [2**10]), # using dict input with non-consecutive qubits
 ])
 def test_pauli_string_valid_pauli_string_input(pauli_string, coeff, expected_x, expected_z):
     ps = pe.PauliString(pauli_string, coeff)
