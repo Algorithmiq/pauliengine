@@ -1,21 +1,20 @@
-import numpy as np
 import pytest
 
 import pauliengine as pe
 
 
 @pytest.mark.parametrize(("pauli_string", "coeff", "expected_x", "expected_z"), [
-    ({0:"I", 1:"Z", 2:"X"}, 5.0, [3], [2]), # using dict input
-    ({10: 'Z', 2: 'X'}, 6.0, [2**10 + 2**3] , [2**10]), # using dict input with non-consecutive qubits
+    ({0:"I", 1:"Z", 2:"X"}, 5.0, [6], [2]), # using dict input
+    ({10: 'Z', 2: 'X'}, 6.0, [2**10 + 2**2] , [2**10]), # using dict input with non-consecutive qubits
 ])
 def test_pauli_string_valid_pauli_string_input(pauli_string, coeff, expected_x, expected_z):
     ps = pe.PauliString(pauli_string, coeff)
     # TODO: coeff is an Expression object, need to be exposed to Python somehow. 
     # assert ps.coeff == coeff
     assert ps.x == expected_x
-    assert ps.z == expected_z
+    assert ps.y == expected_z
 
-@pytest.xfail(reason="Currently, the PauliString constructor does not validate the input, but it should.")
+@pytest.mark.xfail
 @pytest.mark.parametrize("invalid_pauli_string", [
     {0: "A", 2: "B", 3: "Z"}, # invalid character
     {0: "i", 2: "z", 3: "y"}, # lowercase character
