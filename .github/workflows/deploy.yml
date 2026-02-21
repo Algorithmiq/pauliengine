@@ -57,16 +57,17 @@ jobs:
     runs-on: ${{ matrix.runs-on }}
     strategy:
       matrix:
-        os: [ linux-intel, linux-arm, macos-arm, windows-intel, windows-arm]
+        # os: [ linux-intel, linux-arm, macos-arm, windows-intel, windows-arm]
+        os: [ windows-intel, windows-arm]
         include:
           - archs: native
             platform: auto
-          - os: linux-intel
-            runs-on: ubuntu-latest
-          - os: linux-arm
-            runs-on: ubuntu-24.04-arm
-          - os: macos-arm
-            runs-on: macos-latest
+          # - os: linux-intel
+          #   runs-on: ubuntu-latest
+          # - os: linux-arm
+          #   runs-on: ubuntu-24.04-arm
+          # - os: macos-arm
+          #   runs-on: macos-latest
           - os: windows-intel
             runs-on: windows-latest
           - os: windows-arm
@@ -106,10 +107,11 @@ jobs:
             conan install .  --output-folder=build --build=missing -pr ./conan_profile
           CIBW_BEFORE_ALL_WINDOWS: |
             pip install delvewheel conan
+
             conan profile detect --force
 
             # install symengine
-            conan install .  --output-folder=build --build=missing -pr ./conan_profile 
+            conan install . --output-folder=build --build=missing -pr conan_profile 
           # do not activate architecture-dependent compiler flags
           # 4 jobs in parallel, but do not start new ones if load average exceeds 5
           CIBW_ENVIRONMENT_LINUX: 
