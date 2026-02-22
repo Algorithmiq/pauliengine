@@ -25,7 +25,7 @@ QubitHamiltonian::QubitHamiltonian(const Hamiltonian_structure_variable& data) {
 }
 
 QubitHamiltonian QubitHamiltonian::compact() {
-        std::unordered_map<PauliString<>, Coeff, PauliStringHash> merged;
+        std::unordered_map<PauliString<>, SymEngine::Expression, PauliStringHash> merged;
         for (const auto& ps : data) {
                 merged[ps] = merged[ps] + ps.coeff;
         }

@@ -40,7 +40,7 @@ class PauliString {
                 uint64_t is_zero{true};
                 PauliString() = default;
 
-                PauliString(Coeff coeff, const std::unordered_map<int, std::string>& data) {
+                PauliString(std::complex<double> coeff, const std::unordered_map<int, std::string>& data) {
                         this->coeff = coeff;
                         uint64_t mask;
                         for (const auto& [key, value] : data) {
@@ -62,7 +62,59 @@ class PauliString {
                         }
                 }
 
-                PauliString(const std::vector<uint64_t>& x, const std::vector<uint64_t>& y, Coeff coeff) : x{x}, y{y}, coeff{coeff} {
+                PauliString(std::string coeff, std::unordered_map<int, std::string>& data) {
+                        this->coeff = coeff;
+                        uint64_t mask;
+                        for (const auto& [key, value] : data) {
+
+
+                                size_t index = key / BITS_IN_INTEGER;
+                                if((index) + 1 > x.size()) {
+                                        size_t difference = index + 1 - x.size();
+                                        for (int i = 0; i < difference; i++) {
+                                                x.push_back(0);
+                                                y.push_back(0);
+                                        }
+                                }
+                                mask = ((uint64_t) 1 <<  key % BITS_IN_INTEGER);
+                                if (value == "X" || value == "Z") {
+                                        this->x[index] |= mask;
+                                } 
+                                if (value == "Y" || value == "Z") {
+                                        this->y[index] |= mask;
+                                }
+                        }
+                }
+
+#ifdef HAVE_SYMENGINE
+                PauliString(Expression coeff, const std::unordered_map<int, std::string>& data) {
+                        this->coeff = coeff;
+                        uint64_t mask;
+                        for (const auto& [key, value] : data) {
+
+                                size_t index = key / BITS_IN_INTEGER;
+                                if((index) + 1 > x.size()) {
+                                        size_t difference = index + 1 - x.size();
+                                        for (int i = 0; i < difference; i++) {
+                                                x.push_back(0);
+                                                y.push_back(0);
+                                        }
+                                }
+                                mask = ((uint64_t) 1 <<  key % BITS_IN_INTEGER);
+                                if (value == "X" || value == "Z") {
+                                        this->x[index] |= mask;
+                                } 
+                                if (value == "Y" || value == "Z") {
+                                        this->y[index] |= mask;
+                                }
+                        }
+                }
+#endif
+
+                PauliString(const std::vector<uint64_t>& x, const std::vector<uint64_t>& y, Coeff coeff) {
+                        this->x = x;
+                        this->y = y;
+                        this->coeff = coeff;
                 }
 
                 PauliString(const std::pair<std::complex<double>, std::vector<std::pair<char, int>>>& input) {
@@ -104,27 +156,6 @@ class PauliString {
                                         this->y[index] |= mask;
                                 }
 
-                        }
-                }
-
-                PauliString(const std::string &pauli_string, Coeff &coeff){
-                        uint64_t mask;
-                        for (size_t i = 0; i < pauli_string.size(); i++) {
-                                size_t index = i / BITS_IN_INTEGER;
-                                if((index) + 1 > x.size()) {
-                                        size_t difference = index + 1 - x.size();
-                                        for (int i = 0; i < difference; i++) {
-                                                x.push_back(0);
-                                                y.push_back(0);
-                                        }
-                                }
-                                mask = ((uint64_t) 1 <<  i % BITS_IN_INTEGER);
-                                if (pauli_string[i] == 'X' || pauli_string[i] == 'Z') {
-                                        this->x[index] |= mask;
-                                } 
-                                if (pauli_string[i] == 'Y' || pauli_string[i] == 'Z') {
-                                        this->y[index] |= mask;
-                                }
                         }
                 }
 
