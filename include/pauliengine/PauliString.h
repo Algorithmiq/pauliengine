@@ -35,103 +35,36 @@ class PauliString {
                 uint64_t is_zero{true};
                 PauliString() = default;
 
-                PauliString(std::complex<double> coeff, const std::unordered_map<int, std::string>& data) {
-                        this->coeff = coeff;
-                        uint64_t mask;
-                        for (const auto& [key, value] : data) {
-                                size_t index = key / BITS_IN_INTEGER;
-                                if((index) + 1 > x.size()) {
-                                        size_t difference = index + 1 - x.size();
-                                        for (int i = 0; i < difference; i++) {
-                                                x.push_back(0);
-                                                y.push_back(0);
-                                        }
-                                }
-                                mask = ((uint64_t) 1 <<  key % BITS_IN_INTEGER);
-                                if (value == "X" || value == "Z") {
-                                        this->x[index] |= mask;
-                                }
-                                if (value == "Y" || value == "Z") {
-                                        this->y[index] |= mask;
-                                }
-                        }
-                }
-
-                PauliString(std::string coeff, std::unordered_map<int, std::string>& data) {
-                        this->coeff = coeff;
-                        uint64_t mask;
-                        for (const auto& [key, value] : data) {
-
-
-                                size_t index = key / BITS_IN_INTEGER;
-                                if((index) + 1 > x.size()) {
-                                        size_t difference = index + 1 - x.size();
-                                        for (int i = 0; i < difference; i++) {
-                                                x.push_back(0);
-                                                y.push_back(0);
-                                        }
-                                }
-                                mask = ((uint64_t) 1 <<  key % BITS_IN_INTEGER);
-                                if (value == "X" || value == "Z") {
-                                        this->x[index] |= mask;
-                                }
-                                if (value == "Y" || value == "Z") {
-                                        this->y[index] |= mask;
-                                }
-                        }
-                }
-
-                PauliString(Expression coeff, const std::unordered_map<int, std::string>& data) {
-                        this->coeff = coeff;
-                        uint64_t mask;
-                        for (const auto& [key, value] : data) {
-
-                                size_t index = key / BITS_IN_INTEGER;
-                                if((index) + 1 > x.size()) {
-                                        size_t difference = index + 1 - x.size();
-                                        for (int i = 0; i < difference; i++) {
-                                                x.push_back(0);
-                                                y.push_back(0);
-                                        }
-                                }
-                                mask = ((uint64_t) 1 <<  key % BITS_IN_INTEGER);
-                                if (value == "X" || value == "Z") {
-                                        this->x[index] |= mask;
-                                }
-                                if (value == "Y" || value == "Z") {
-                                        this->y[index] |= mask;
-                                }
-                        }
-                }
-
                 PauliString(const std::vector<uint64_t>& x, const std::vector<uint64_t>& y, Coeff coeff) {
                         this->x = x;
                         this->y = y;
                         this->coeff = coeff;
                 }
 
-                PauliString(const std::pair<std::complex<double>, std::vector<std::pair<char, int>>>& input) {
-                        this->coeff = input.first;
-                        std::vector<std::pair<char, int>> paulis = input.second;
-                        uint64_t mask = 0;
-                        for (int i = 0; i < paulis.size(); i++) {
-                                size_t index = paulis[i].second / BITS_IN_INTEGER;
-                                if ((index) + 1 > x.size()) {
-                                        x.push_back(0);
-                                        y.push_back(0);
+
+                PauliString(Coeff coeff, const std::unordered_map<int, std::string>& data) {
+                        this->coeff = coeff;
+                        uint64_t mask;
+                        for (const auto& [key, value] : data) {
+                                size_t index = key / BITS_IN_INTEGER;
+                                if((index) + 1 > x.size()) {
+                                        size_t difference = index + 1 - x.size();
+                                        for (int i = 0; i < difference; i++) {
+                                                x.push_back(0);
+                                                y.push_back(0);
+                                        }
                                 }
-                                uint64_t mask = ((uint64_t) 1 <<  paulis[i].second % BITS_IN_INTEGER);
-                                if (paulis[i].first == 'X' || paulis[i].first == 'Z') {
+                                mask = ((uint64_t) 1 <<  key % BITS_IN_INTEGER);
+                                if (value == "X" || value == "Z") {
                                         this->x[index] |= mask;
                                 }
-                                if (paulis[i].first == 'Y' || paulis[i].first == 'Z') {
+                                if (value == "Y" || value == "Z") {
                                         this->y[index] |= mask;
                                 }
-
                         }
                 }
 
-                PauliString(const std::pair<std::string, std::vector<std::pair<char, int>>>& input) {
+                PauliString(const std::pair<Coeff, std::vector<std::pair<char, int>>>& input) {
                         this->coeff = input.first;
                         std::vector<std::pair<char, int>> paulis = input.second;
                         uint64_t mask = 0;
@@ -489,9 +422,9 @@ class PauliString {
                 }
 
 };
-
+template<typename Coeff>
 struct PauliStringHash {
-    size_t operator()(const PauliString<>& ps) const {
+    size_t operator()(const PauliString<Coeff>& ps) const {
         size_t seed = 0;
         for (auto& val : ps.x) {
             seed ^= std::hash<uint64_t>{}(val) + 0x9e3779b9 + (seed << 6) + (seed >> 2);

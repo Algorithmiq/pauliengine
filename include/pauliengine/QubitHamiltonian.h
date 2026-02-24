@@ -10,40 +10,65 @@
 using SymEngine::Expression;
 
 
-
-
 #define BITS_IN_INTEGER (sizeof(uint64_t) * 8)
 
+template<typename Coeff>
+using Pauli_structure = std::pair<Coeff, std::unordered_map<int, std::string>>;
 
-using Pauli_structure = std::pair<std::complex<double>, std::unordered_map<int, std::string>>;
-using Pauli_structure_variable = std::pair<SymEngine::Expression, std::unordered_map<int, std::string>>;
-using Hamiltonian_structure_variable = std::vector<Pauli_structure_variable>;
+template<typename Coeff>
+using Hamiltonian_structure = std::vector<Pauli_structure<Coeff>>;
 
-using Hamiltonian_structure = std::vector<Pauli_structure>;
 using Matrix2D = std::vector<std::vector<std::complex<double>>>;
 
 const std::complex<double> neg_I(0.0 , -1.0);
 
-
+template<typename Coeff>
 class QubitHamiltonian{
     public:
-    std::vector<PauliString<>> data;
+    std::vector<PauliString<Coeff>> data;
 
-    QubitHamiltonian(const std::vector<PauliString<>>& data);
-    QubitHamiltonian(const Hamiltonian_structure& data);
-    QubitHamiltonian trace_out_qubits(const std::vector<int>& qubits, const std::vector<int>& state);
-    std::string to_string();
+        QubitHamiltonian(const std::vector<PauliString<Coeff>>& data){
+                this->data = data;
+        }
+
+        QubitHamiltonian(const Hamiltonian_structure<Coeff>& data){
+                std::vector<PauliString<Coeff>> converted_data;
+                converted_data.reserve(data.size());
+                for (Pauli_structure<Coeff> entry : data) {
+                        converted_data.push_back(PauliString<Coeff>(entry.first, entry.second));
+                }
+                this->data = converted_data;
+        }
+
+        QubitHamiltonian trace_out_qubits(const std::vector<int>& qubits, const std::vector<int>& state){
+        std::vector<PauliString<Coeff>> reduced(this->data.size());
+        for (PauliString<Coeff>& current : this-> data) {
+                PauliString<Coeff> traced_out_string = current.trace_out_qubits(qubits, state);
+                if (traced_out_string.coeff != 0.0) {
+                        reduced.push_back(traced_out_string);
+                }
+        }
+        return QubitHamiltonian(reduced);
+}
+        std::string to_string(){
+                std::string result = "";
+                for (int i = 0; i < this->data.size(); i++) {
+                        result.append(data[i].to_string() + "\n");
+                }
+                return result;
+        }
 
 
-    QubitHamiltonian operator*(std::complex<double> scale) const{
+        QubitHamiltonian operator*(std::complex<double> scale) const{
             QubitHamiltonian to_scale = QubitHamiltonian(this->data);
             for (auto &entry : to_scale.data) {
                     entry.coeff *= scale;
                 }
                 return to_scale;
         }
+
         QubitHamiltonian operator*(QubitHamiltonian other) const{
-                std::vector<PauliString<>> data;
+                std::vector<PauliString<Coeff>> data;
                 data.reserve(this->data.size() * other.data.size());
                 for (auto &entry_first : this->data) {
                         for (auto &entry_second : other.data) {
@@ -53,8 +78,9 @@ class QubitHamiltonian{
                 // return QubitHamiltonian(data).compact();
                 return QubitHamiltonian(data);
         }
+
         QubitHamiltonian operator+(const QubitHamiltonian& other) {
-                std::vector<PauliString<>> data;
+                std::vector<PauliString<Coeff>> data;
                 QubitHamiltonian first_parsed = QubitHamiltonian(this->data);
                 QubitHamiltonian second_parsed = QubitHamiltonian(other.data);
                 size_t remaining_in_second = second_parsed.data.size();
@@ -72,19 +98,19 @@ class QubitHamiltonian{
                         }
                 }
                 data.reserve(first_parsed.data.size() + remaining_in_second);
-                for (PauliString first_data : first_parsed.data) {
+                for (PauliString<Coeff> first_data : first_parsed.data) {
                         data.push_back(first_data);
                 }
-                for (PauliString remaining : second_parsed.data) {
+                for (PauliString<Coeff> remaining : second_parsed.data) {
                         data.push_back(remaining);
                 }
                 return QubitHamiltonian(data);
         }
 
         QubitHamiltonian diff(std::string symbol) const{
-                std::vector<PauliString<>> data;
-                for (const PauliString<>& ps : this->data) {
-                        PauliString<> temp = ps.diff(symbol);
+                std::vector<PauliString<Coeff>> data;
+                for (const PauliString<Coeff>& ps : this->data) {
+                        PauliString<Coeff> temp = ps.diff(symbol);
                         if (temp.is_zero == false) {
                                 data.push_back(temp);
                         }
@@ -92,21 +118,31 @@ class QubitHamiltonian{
                 return QubitHamiltonian(data);
     }
 
-    QubitHamiltonian substitute(const std::unordered_map<std::string, std::complex<double>>& substitution_map) const {
-            std::vector<PauliString<>> temp_data;
-            for (const auto &ps : data) {
-                    temp_data.push_back(ps.substitute(substitution_map));
+        QubitHamiltonian substitute(const std::unordered_map<std::string, std::complex<double>>& substitution_map) const {
+                std::vector<PauliString<Coeff>> temp_data;
+                for (const auto &ps : data) {
+                        temp_data.push_back(ps.substitute(substitution_map));
+                        }
+                        return QubitHamiltonian(temp_data);
                 }
-                return QubitHamiltonian(temp_data);
+
+
+        QubitHamiltonian compact(){
+        std::unordered_map<PauliString<Coeff>, SymEngine::Expression, PauliStringHash> merged;
+        for (const auto& ps : data) {
+                merged[ps] = merged[ps] + ps.coeff;
         }
+        data.clear();
+        for (const auto& [ps, coeff] : merged) {
+                PauliString<Coeff> new_ps = ps;
+                new_ps.coeff = coeff;
+                data.push_back(new_ps);
+        }
+        return QubitHamiltonian(data);
+}
 
-
-        QubitHamiltonian(const Hamiltonian_structure_variable& data);
-
-        QubitHamiltonian compact();
-
-        Hamiltonian_structure_variable parse_python_format() const{
-                Hamiltonian_structure_variable output;
+        Hamiltonian_structure parse_python_format() const{
+                Hamiltonian_structure output;
             output.reserve(this->data.size());
             for (const auto& entry : this->data) {
                     std::unordered_map<int, std::string> temp;
