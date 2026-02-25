@@ -33,6 +33,7 @@ NB_MODULE(_core, m) {
                 .def("commutator", &PauliString<std::complex<double>>::commutator, "Computes the commutator with another Pauli string.")
                 .def("map_qubits", &PauliString<std::complex<double>>::map_qubits, "Remaps qubit indices according to a given mapping.")
                 .def("__mul__", nb::overload_cast<const PauliString<std::complex<double>>&>(&PauliString<std::complex<double>>::operator*, nb::const_), "Multiply two PauliStrings")
+                // TODO: Implement multiplication for PauliString with SymEngine::Expression coeff.
                 .def("__mul__", nb::overload_cast<const std::complex<double>>(&PauliString<std::complex<double>>::operator*), "Scale PauliString by complex scalar")
                 .def("__imul__", nb::overload_cast<const std::complex<double>>(&PauliString<std::complex<double>>::operator*=), "In-place scale")
                 .def("__imul__", nb::overload_cast<const PauliString<std::complex<double>>&>(&PauliString<std::complex<double>>::operator*=), "In-place multiply")
