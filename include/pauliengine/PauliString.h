@@ -41,26 +41,11 @@ class PauliString {
                         this->coeff = coeff;
                 }
 
-
                 PauliString(Coeff coeff, const std::unordered_map<int, std::string>& data) {
                         this->coeff = coeff;
                         uint64_t mask;
                         for (const auto& [key, value] : data) {
-                                size_t index = key / BITS_IN_INTEGER;
-                                if((index) + 1 > x.size()) {
-                                        size_t difference = index + 1 - x.size();
-                                        for (int i = 0; i < difference; i++) {
-                                                x.push_back(0);
-                                                y.push_back(0);
-                                        }
-                                }
-                                mask = ((uint64_t) 1 <<  key % BITS_IN_INTEGER);
-                                if (value == "X" || value == "Z") {
-                                        this->x[index] |= mask;
-                                }
-                                if (value == "Y" || value == "Z") {
-                                        this->y[index] |= mask;
-                                }
+                                get_symplectic_form(key, mask, value);
                         }
                 }
 
@@ -69,25 +54,30 @@ class PauliString {
                         std::vector<std::pair<char, int>> paulis = input.second;
                         uint64_t mask = 0;
                         for (int i = 0; i < paulis.size(); i++) {
-                                size_t index = paulis[i].second / BITS_IN_INTEGER;
-                                if ((index) + 1 > x.size()) {
-                                        x.push_back(0);
-                                        y.push_back(0);
-                                }
-                                uint64_t mask = ((uint64_t) 1 <<  paulis[i].second % BITS_IN_INTEGER);
-                                if (paulis[i].first == 'X' || paulis[i].first == 'Z') {
-                                        this->x[index] |= mask;
-                                }
-                                if (paulis[i].first == 'Y' || paulis[i].first == 'Z') {
-                                        this->y[index] |= mask;
-                                }
+                                get_symplectic_form(paulis[i].second, mask, std::string(1, paulis[i].first));
 
                         }
                 }
 
+                /**
+                 * @brief Construct a new Pauli String object
+                 *
+                 * @param pauli_string : A string representation of the Pauli string.
+                 * @param coeff : The coefficient associated with the Pauli string.
+                 */
+                PauliString(const std::string &pauli_string, Coeff &coeff){
+                        this->coeff = coeff;
+                        uint64_t mask;
+                        for (size_t i = 0; i < pauli_string.size(); i++) {
+                                get_symplectic_form(i, mask, pauli_string[i]);
+                        }
+                }
+
+
                 uint64_t operator==(const PauliString& other) const {
                         return x == other.x && y == other.y;
                 }
+
 
                 PauliString &operator*=(const PauliString& other) {
                         // Source: https://arxiv.org/pdf/2103.02202 figure 12
@@ -143,7 +133,7 @@ class PauliString {
                         return copy;
                 }
 
-                PauliString operator*(const std::complex<double> scalar) {
+                PauliString operator*(const std::complex<double> scalar){
                         return PauliString(this->x, this->y, this->coeff * scalar);
                 }
 
@@ -394,6 +384,10 @@ class PauliString {
                         return this->x == other.x && this->y == other.y && PauliString::to_complex(this->coeff) == PauliString::to_complex(other.coeff);
                 }
 
+                static std::complex<double> to_complex(const std::complex<double>& expr) {
+                        return expr;
+                }
+
                 static std::complex<double> to_complex(const Expression &expr) {
                         const auto &basic = *expr.get_basic();
 
@@ -428,6 +422,23 @@ class PauliString {
                                 }
                         }
                         return symbols;
+                }
+
+                void get_symplectic_form(size_t pauli_index, uint64_t& mask, const std::string& pauli_char) {
+                        size_t index = pauli_index / BITS_IN_INTEGER;
+                        if ((index) + 1 > x.size()) {
+                                x.push_back(0);
+                                y.push_back(0);
+                        }
+                        mask = ((uint64_t) 1 <<  pauli_index % BITS_IN_INTEGER);
+
+
+                        if (pauli_char == "X" || pauli_char == "Z") {
+                                this->x[index] |= mask;
+                        }
+                        if (pauli_char == "Y" || pauli_char == "Z") {
+                                this->y[index] |= mask;
+                        }
                 }
 
 };

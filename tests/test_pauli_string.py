@@ -18,9 +18,8 @@ import pauliengine as pe
 def test_pauli_string_valid_pauli_string_input(
     pauli_string, coeff, expected_x, expected_z
 ):
-    ps = pe.PauliString(pauli_string, coeff)
-    # TODO: coeff is an Expression object, need to be exposed to Python somehow.
-    # assert ps.coeff == coeff
+    ps = pe.PauliString(coeff, pauli_string)
+    assert ps.coeff == coeff
     assert ps.x == expected_x
     assert ps.y == expected_z
 
@@ -34,27 +33,27 @@ def test_pauli_string_valid_pauli_string_input(
     ],
 )
 def test_pauli_string_invalid_pauli_string_input(invalid_pauli_string):
-    with pytest.raises(ValueError):
-        pe.PauliString(invalid_pauli_string, 1.0)
+    with pytest.raises(ValueError):  # noqa: PT011
+        pe.PauliString(1.0, invalid_pauli_string)
 
 
 @pytest.mark.parametrize(
     ("pauli_string", "other", "expected_product"),
     [
         (
-            pe.PauliString({0: "X", 1: "Z", 2: "Y", 3: "Z"}, 1.0),
-            pe.PauliString({0: "Z", 1: "Z", 3: "X"}, 2.0),
-            pe.PauliString({0: "Y", 2: "Y", 3: "Y"}, 2.0),
+            pe.PauliString(1.0, {0: "X", 1: "Z", 2: "Y", 3: "Z"}),
+            pe.PauliString(2.0, {0: "Z", 1: "Z", 3: "X"}),
+            pe.PauliString(2.0, {0: "Y", 2: "Y", 3: "Y"}),
         ),  # XZYZ * ZZIX = YIYY
         (
-            pe.PauliString({0: "Z", 2: "Z"}, 2.0j),
-            pe.PauliString({0: "Y", 2: "Y"}, 3.0),
-            pe.PauliString({0: "X", 2: "X"}, -6.0j),
+            pe.PauliString(2.0j, {0: "Z", 2: "Z"}),
+            pe.PauliString(3.0, {0: "Y", 2: "Y"}),
+            pe.PauliString(-6.0j, {0: "X", 2: "X"}),
         ),  # XZ * ZX = YY
         (
-            pe.PauliString({0: "X", 1: "Y"}, -4.0),
+            pe.PauliString(-4.0, {0: "X", 1: "Y"}),
             1.0 - 2.0j,
-            pe.PauliString({0: "X", 1: "Y"}, -4.0 + 8.0j),
+            pe.PauliString(-4.0 + 8.0j, {0: "X", 1: "Y"}),
         ),  # -4.0XY * 1.0 - 2.0j
     ],
 )
